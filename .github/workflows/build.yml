@@ -9,10 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Setup Node
-      uses: actions/setup-node@v3
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
         
@@ -21,20 +22,24 @@ jobs:
         npm install -g cordova
         cordova telemetry off
         
-    - name: Create App
+    - name: Create Cordova Project
       run: |
-        cordova create age-calculator com.yourapp.agecalculator "Age Calculator"
+        cordova create age-calculator com.youragecalculator AgeCalculator
         cd age-calculator
         cp ../index.html www/
-        cordova platform add android
+        cordova platform add android@latest
         
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
     - name: Build APK
       run: |
         cd age-calculator
         cordova build android --release
         
     - name: Upload APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: age-calculator-apk
         path: age-calculator/platforms/android/app/build/outputs/apk/release/
+        retention-days: 30
